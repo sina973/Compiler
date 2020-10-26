@@ -44,7 +44,36 @@ Nodes[1].add_to_edges(2, ['other'])
 Nodes[2].set_back_track()
 Nodes[2].set_final_state()
 
-Nodes[2].add_to_edges(4, ['other'])
+Nodes[3].add_to_edges(4, ['other'])
+
+Nodes[4].set_back_track()
+Nodes[4].set_final_state()
+
+Nodes[5].set_final_state()
+
+Nodes[6].add_to_edges(7, ['='])
+Nodes[6].add_to_edges(9, ['other1'])
+
+Nodes[7].set_final_state()
+
+Nodes[8].add_to_edges(9, ['other2'])
+
+Nodes[9].set_back_track()
+Nodes[9].set_final_state()
+
+Nodes[10].add_to_edges(11, ['/'])
+Nodes[10].add_to_edges(13, ['*'])
+
+Nodes[11].add_to_edges(12, ['\n'])
+Nodes[11].add_to_edges(11, ['other3'])
+
+Nodes[12].set_final_state()
+
+
+
+
+
+
 
 
 
