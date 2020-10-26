@@ -1,7 +1,7 @@
 class Node:
 
-    def __init__(self, name, array=None):
-        self.name = name
+    def __init__(self, id, array=None):
+        self.id = id
         self.exit_edge = array
 
     def add_to_edges(self, node, expression):
@@ -11,8 +11,11 @@ class Node:
         return self.exit_edge
 
     def get_name(self):
-        return self.name
+        return self.id
 
 
-dictionary = {}
-dictionary.
+Nodes = {}
+for i in range(0, 16):
+    Nodes[i] = Node(i)
+
+
