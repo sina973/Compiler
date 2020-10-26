@@ -140,28 +140,27 @@ Nodes[15].set_final_state()
 # ###################### end of assignments ##########################
 
 file = open("input.txt", 'r')
-lines = file.read()
+input_file = file.read()
 file.close()
-state = True
+while_state = True
 pointer = 0
-while state:
-    print(lines[pointer], end=" ")
-    if not lines[pointer + 1]:
-        state = False
-    pointer += 1
+
+
+# def check_edges():
+
 
 
 def get_next_token():
-    return None
+    temp_lexeme = ""
+    current_char = input_file[pointer]
+    if is_valid(current_char):
+        #check_edges(current_char, pointer)
 
 
 
-
-
-
-
-
-
-
-
+while while_state:
+    print(input_file[pointer], end=" ")
+    if pointer == (len(input_file) - 1):
+        while_state = False
+    pointer += 1
 
