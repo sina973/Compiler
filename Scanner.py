@@ -21,12 +21,72 @@ class Node:
     def set_final_state(self):
         self.final_state = True
 
+
 Nodes = []
-state = 'start'
+state = 0
 lexeme = ''
+symbol_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
+
+
+def is_valid(ch):           # Check if input character is valid
+    valid_list = [';', ':', ',', '[', ']', '(', ')', '{', '}', '+', '-', '<', '*', '=', '/']
+    if ch.isdigit():
+        return True
+    if ch.isalpha():
+        return True
+    if ch.isspace():
+        return True
+    for i in range(0, len(valid_list)):
+        if ch == valid_list[i]:
+            return True
+
+    return False
+
+
+def is_other(ch):
+    if not ch.isdigit():
+        if not ch.isalpha():
+            return True
+    elif not ch.isalpha():
+        return True
+    return False
+
+
+def is_other1(ch):
+    if ch != "=":
+        return True
+    return False
+
+
+def is_other2(ch):
+    if ch != "/":
+        return True
+    return False
+
+
+def is_other3(ch):
+    if ch != "\n":
+        return True
+    return False
+
+
+def is_other4(ch):
+    if ch != "*":
+        return True
+    return False
+
+
+def is_other5(ch):
+    if ch != "*":
+        if ch != '/':
+            return True
+    elif ch != "/":
+        return True
+    return False
+
 
 for i in range(0, 16):
-    Nodes[i] = Node(i)
+    Nodes.append(Node(i))
 
 # #############  Add exit edges of each node ##################
 
@@ -69,15 +129,22 @@ Nodes[11].add_to_edges(11, ['other3'])
 
 Nodes[12].set_final_state()
 
-Nodes[13].add_to_edges(13, ['other4'])
-Nodes[13].add_to_edges(14, ['*'])
+# ###################### end of assignments ##########################
 
-Nodes[14].add_to_edges(14, ['*'])
-Nodes[14].add_to_edges(13, ['other5'])
+file = open("input.txt", 'r')
+lines = file.read()
+file.close()
+state = True
+pointer = 0
+while state:
+    print(lines[pointer], end=" ")
+    if not lines[pointer + 1]:
+        state = False
+    pointer += 1
 
-Nodes[15].set_final_state()
 
-
+def get_next_token():
+    return None
 
 
 
