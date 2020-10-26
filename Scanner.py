@@ -149,16 +149,60 @@ def is_other5(ch):
 
 def check_edges(ch):
     state_edges =  Nodes[state].get_edges()
-    for i in state_edges:
+    return_state = False
+    for k,v in state_edges:
+        for i in v:
+            if i == 'letter':
+                if ch.isalpha():
+                    return_state = k
+            elif i == 'digit':
+                if ch.isdigit():
+                    return_state = k
+            elif i == 'space':
+                if ch.isspace():
+                    return_state = k
+            elif i == 'other':
+                if is_other(ch):
+                    return_state = k
+            elif i == 'other1':
+                if is_other1(ch):
+                    return_state = k
+            elif i == 'other2':
+                if is_other2(ch):
+                    return_state = k
+            elif i == 'other3':
+                if is_other3(ch):
+                    return_state = k
+            elif i == 'other4':
+                if is_other4(ch):
+                    return_state = k
+            elif i == 'other5':
+                if is_other5(ch):
+                    return_state = k
+            else:
+                if ch == i:
+                    return_state = k
 
+    return return_state
 
 
 
 def get_next_token():
     temp_lexeme = ""
+    next_state = state
     current_char = input_file[pointer]
     if is_valid(current_char):
-        check_edges(current_char)
+        next_state = check_edges(current_char)
+        if not next_state:
+            #error
+        else:
+            # change state
+            temp_lexeme += current_char
+            if Nodes[next_state].final_state:
+
+
+    else:
+        # error
 
 
 
