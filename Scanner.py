@@ -1,11 +1,11 @@
 class Node:
 
-    def __init__(self, id, array=None):
+    def __init__(self, id):
         self.id = id
-        self.exit_edge = array
+        self.exit_edge = {}
 
     def add_to_edges(self, node, expression):
-        self.exit_edge.append((node, expression))
+        self.exit_edge[node] = expression
 
     def get_edges(self):
         return self.exit_edge
