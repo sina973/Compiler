@@ -39,9 +39,13 @@ Nodes[0].add_to_edges(10, ['/'])
 Nodes[0].add_to_edges(15, ['space'])
 
 Nodes[1].add_to_edges(1, ['letter', 'digit'])
-Nodes[1].add_to_edges(2, ['other1'])
-Nodes[1].add_to_edges(1, ['letter', 'digit'])
-Nodes[1].add_to_edges(1, ['letter', 'digit'])
+Nodes[1].add_to_edges(2, ['other'])
+
+Nodes[2].set_back_track()
+Nodes[2].set_final_state()
+
+Nodes[2].add_to_edges(4, ['other'])
+
 
 
 
