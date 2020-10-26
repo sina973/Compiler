@@ -69,6 +69,13 @@ Nodes[11].add_to_edges(11, ['other3'])
 
 Nodes[12].set_final_state()
 
+Nodes[13].add_to_edges(13, ['other4'])
+Nodes[13].add_to_edges(14, ['*'])
+
+Nodes[14].add_to_edges(14, ['*'])
+Nodes[14].add_to_edges(13, ['other5'])
+
+Nodes[15].set_final_state()
 
 
 
