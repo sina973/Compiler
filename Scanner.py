@@ -323,4 +323,3 @@ while while_state:
 
     if pointer == (len(input_file) - 1):
         while_state = False
-
