@@ -32,7 +32,6 @@ class Node:
 Nodes = []
 state = 0
 keyword_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
-symbols = []
 symbol_list = []
 for i in keyword_list:
     symbol_list.append([i])
@@ -48,7 +47,8 @@ error_file = open("lexical_errors.txt", 'a')
 
 # open the Symbol table file
 symbol_table_file = open('symbol_table.txt', 'w')
-symbol_table_file.write("1.\tif\n2.\telse\n3.\tvoid\n4.\tint\n5.\twhile\n6.\tbreak\n7.\tswitch\n8.\tdefault\n9.\tcase\n10.\treturn\n")
+symbol_table_file.write("1.\tif\n2.\telse\n3.\tvoid\n4.\tint\n5.\twhile\n6.\tbreak\n7.\tswitch\n8.\tdefault\n9.\tcase"
+                        "\n10.\treturn\n")
 # open the tokens file
 tokens_file = open('tokens.txt', 'w')
 
@@ -77,7 +77,7 @@ Nodes[1].add_to_edges(2, ['other'])
 Nodes[2].set_back_track()
 Nodes[2].set_final_state()
 
-Nodes[3].add_to_edges(4, ['other_prime'])
+Nodes[3].add_to_edges(4, ['other'])
 
 Nodes[4].set_back_track()
 Nodes[4].set_final_state()
@@ -110,6 +110,7 @@ Nodes[13].add_to_edges(13, ['other4'])
 Nodes[13].add_to_edges(14, ['*'])
 
 Nodes[14].add_to_edges(14, ['*'])
+Nodes[14].add_to_edges(15, ['/'])
 Nodes[14].add_to_edges(13, ['other5'])
 
 Nodes[15].set_final_state()
@@ -177,7 +178,7 @@ def is_other5(ch):
 
 def error_handler(error, lexeme, line):
     global errors
-    errors.append(line, lexeme, error)
+    errors.append([line, lexeme, error])
 
 
 def error_description(s):
@@ -204,9 +205,9 @@ def invalid_number_error():
 
 def check_edges(ch, state):
     global Nodes
-    state_edges =  Nodes[state].get_edges()
+    state_edges = Nodes[state].get_edges()
     return_state = False
-    for k,v in state_edges:
+    for k, v in state_edges.items():
         for i in v:
             if i == 'letter':
                 if ch.isalpha():
@@ -252,18 +253,23 @@ def change_state_by_char(string, pointer, state, lexeme):
     temp_lexeme = ""
     if is_valid(current_char):
         next_state = check_edges(current_char, state)
+        # print(next_state)
         if not next_state:
             error = error_description(state)
+            pointer_move = 1
+            temp_lexeme = lexeme + current_char
         else:
             # ################ change state
-            temp_lexeme = lexeme + current_char
             if Nodes[next_state].final_state:
                 token_found = True
                 if Nodes[next_state].back_track:
+                    temp_lexeme = lexeme
                     pointer_move = 0
                 else:
+                    temp_lexeme = lexeme + current_char
                     pointer_move = 1
             else:
+                temp_lexeme = lexeme + current_char
                 pointer_move = 1
     else:
         error = "invalid input"
@@ -271,6 +277,7 @@ def change_state_by_char(string, pointer, state, lexeme):
         temp_lexeme = lexeme + current_char
 
     return token_found, next_state, pointer_move, temp_lexeme, error
+
 
 def get_token_name(state, lexeme):
     if state == 2:
@@ -280,6 +287,7 @@ def get_token_name(state, lexeme):
         return "ID"
     else:
         return Nodes[state].description
+
 
 def get_next_token():
     global pointer
@@ -292,6 +300,7 @@ def get_next_token():
     return_state = []
 
     while True:
+        #print(pointer, input_file[pointer], state)
         return_state = change_state_by_char(input_file, pointer, state, temp_lexeme)
         temp_lexeme = return_state[3]
         pointer += return_state[2]
@@ -300,7 +309,6 @@ def get_next_token():
             token_name = get_token_name(return_state[1], temp_lexeme)
             if return_state[1] == 15:
                 if temp_lexeme == "\n":
-                    state = return_state[1]
                     line += 1
                 temp_lexeme = ""
             elif return_state[1] == 12:
@@ -312,14 +320,25 @@ def get_next_token():
         elif return_state[4] != "":
             error_handler(return_state[4], temp_lexeme, line)
             temp_lexeme = ""
+            state = 0
+        else:
+            state = return_state[1]
+
+
+print(len(input_file))
 
 
 while while_state:
+    #print(pointer)
     token = get_next_token()
-    if len(tokens) < line :
+    print(token)
+    if len(tokens) < line:
         tokens.append([token])
     else:
         tokens[line - 1].append(token)
 
-    if pointer == (len(input_file) - 1):
+    if pointer == (len(input_file) - 10):
         while_state = False
+        print("FALSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+
+print(tokens)
