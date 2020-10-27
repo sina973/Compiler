@@ -35,7 +35,6 @@ line = 0
 tokens = []
 
 
-
 for i in range(0, 16):
     Nodes.append(Node(i))
 
@@ -55,7 +54,7 @@ Nodes[1].add_to_edges(2, ['other'])
 Nodes[2].set_back_track()
 Nodes[2].set_final_state()
 
-Nodes[3].add_to_edges(4, ['other'])
+Nodes[3].add_to_edges(4, ['other_prime'])
 
 Nodes[4].set_back_track()
 Nodes[4].set_final_state()
@@ -112,7 +111,6 @@ def is_other(ch):
     elif not ch.isalpha():
         return True
     return False
-
 
 def is_other1(ch):
     if ch != "=":
@@ -185,20 +183,40 @@ def check_edges(ch):
 
     return return_state
 
+def change_state_by_char(string, pointer, state, lexeme):
+    current_char = string[pointer]
+    next_state = 0
+    pointer_move = 0
+    token_found = False
+    error = ""
+    temp_lexeme = ""
+    if is_valid(current_char):
+        next_state = check_edges(current_char)
+        if not next_state:
+            # Error handler(state)
+        else:
+            # ################ change state
+            temp_lexeme = lexeme + current_char
+            if Nodes[next_state].final_state:
+                token_found = True
+                next_state = 0
+                if Nodes[next_state].back_track:
+                    pointer_move = 0
+                else:
+                    pointer_move = 1
+    else:
+        error = "invalid input"
+        pointer_move = 1
+        temp_lexeme = lexeme + current_char
+
+    return token_found, next_state, pointer_move, temp_lexeme, error
 
 
 def get_next_token():
     temp_lexeme = ""
     next_state = state
     current_char = input_file[pointer]
-    if is_valid(current_char):
-        next_state = check_edges(current_char)
-        if not next_state:
-            #error
-        else:
-            # change state
-            temp_lexeme += current_char
-            if Nodes[next_state].final_state:
+
 
 
     else:
