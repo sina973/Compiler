@@ -32,25 +32,16 @@ class Node:
 Nodes = []
 state = 0
 keyword_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
-symbols = []
 symbol_list = []
 for i in keyword_list:
     symbol_list.append([i])
 
 errors = []
+
 # open the input file
 file = open("input.txt", 'r')
 input_file = file.read()
 file.close()
-
-# open the error file
-error_file = open("lexical_errors.txt", 'a')
-
-# open the Symbol table file
-symbol_table_file = open('symbol_table.txt', 'w')
-symbol_table_file.write("1.\tif\n2.\telse\n3.\tvoid\n4.\tint\n5.\twhile\n6.\tbreak\n7.\tswitch\n8.\tdefault\n9.\tcase\n10.\treturn\n")
-# open the tokens file
-tokens_file = open('tokens.txt', 'w')
 
 while_state = True
 pointer = 0
@@ -272,6 +263,7 @@ def change_state_by_char(string, pointer, state, lexeme):
 
     return token_found, next_state, pointer_move, temp_lexeme, error
 
+
 def get_token_name(state, lexeme):
     if state == 2:
         for i in keyword_list[:11]:
@@ -280,6 +272,7 @@ def get_token_name(state, lexeme):
         return "ID"
     else:
         return Nodes[state].description
+
 
 def get_next_token():
     global pointer
@@ -316,10 +309,30 @@ def get_next_token():
 
 while while_state:
     token = get_next_token()
-    if len(tokens) < line :
+    if len(tokens) < line:
         tokens.append([token])
     else:
         tokens[line - 1].append(token)
 
     if pointer == (len(input_file) - 1):
         while_state = False
+
+
+# open the error file
+error_file = open("lexical_errors.txt", 'a')
+for error in errors:
+    error_file.write(error[0] + ".\t(" + error[1] + "," + error[2] + ")\n")
+
+# open the Symbol table file
+symbol_table_file = open('symbol_table.txt', 'w')
+for i in range(len(symbol_list)):
+    symbol_table_file.write(str(i+1) + ".\t" + symbol_list[i][0])
+
+# open the tokens file
+tokens_file = open('tokens.txt', 'w')
+for i in range(len(tokens)):
+    tokens_file.write(str(i+1) + ".\t")
+    for token in tokens[i]:
+        tokens_file.write(token + " ")
+    tokens_file.write("\n")
+
