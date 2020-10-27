@@ -193,11 +193,12 @@ def invalid_number_error():
 
 # ################################ End Of Error Handler ###############################
 
+
 def check_edges(ch, state):
     global Nodes
     state_edges =  Nodes[state].get_edges()
     return_state = False
-    for k,v in state_edges:
+    for k, v in state_edges:
         for i in v:
             if i == 'letter':
                 if ch.isalpha():
