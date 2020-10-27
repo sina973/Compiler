@@ -37,7 +37,7 @@ symbol_list = []
 for i in keyword_list:
     symbol_list.append([i])
 
-
+errors = []
 # open the input file
 file = open("input.txt", 'r')
 input_file = file.read()
@@ -172,9 +172,15 @@ def is_other5(ch):
         return True
     return False
 
-################################## Error Handler ################################
+# ################################# Error Handler ################################
 
-def error_handler(s):
+
+def error_handler(error, lexeme, line):
+    global errors
+    errors.append(line, lexeme, error)
+
+
+def error_description(s):
     if s == 8:
         return unmatched_comment_error()
     elif s == 3:
@@ -182,16 +188,19 @@ def error_handler(s):
     else:
         return unclosed_comment_error()
 
+
 def unclosed_comment_error():
     return "Unclosed comment"
+
 
 def unmatched_comment_error():
     return "Unmatched comment"
 
+
 def invalid_number_error():
     return "Invalid number"
 
-################################# End Of Error Handler ###############################
+# ################################ End Of Error Handler ###############################
 
 def check_edges(ch, state):
     global Nodes
@@ -244,7 +253,7 @@ def change_state_by_char(string, pointer, state, lexeme):
     if is_valid(current_char):
         next_state = check_edges(current_char, state)
         if not next_state:
-            # Error handler(state)
+            error = error_description(state)
         else:
             # ################ change state
             temp_lexeme = lexeme + current_char
@@ -301,7 +310,8 @@ def get_next_token():
                     symbol_list.append([temp_lexeme])
                 return "(%s, %s)" % (token_name, temp_lexeme)
         elif return_state[4] != "":
-            # handle errors
+            error_handler(return_state[4], temp_lexeme, line)
+            temp_lexeme = ""
 
 
 while while_state:
