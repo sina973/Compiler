@@ -5,6 +5,7 @@ class Node:
         self.exit_edge = {}
         self.back_track = False
         self.final_state = False
+        self.description = ""
 
     def add_to_edges(self, node_id, expression):
         self.exit_edge[node_id] = expression
@@ -21,17 +22,21 @@ class Node:
     def set_final_state(self):
         self.final_state = True
 
+    def set_description(self, description):
+        self.description = description
+
 
 Nodes = []
 state = 0
-lexeme = ''
-symbol_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
+keyword_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
+symbols = []
+symbol_list = []
 file = open("input.txt", 'r')
 input_file = file.read()
 file.close()
 while_state = True
 pointer = 0
-line = 0
+line = 1
 tokens = []
 
 
@@ -58,18 +63,22 @@ Nodes[3].add_to_edges(4, ['other_prime'])
 
 Nodes[4].set_back_track()
 Nodes[4].set_final_state()
+Nodes[4].set_description("NUM")
 
 Nodes[5].set_final_state()
+Nodes[5].set_description("SYMBOL")
 
 Nodes[6].add_to_edges(7, ['='])
 Nodes[6].add_to_edges(9, ['other1'])
 
 Nodes[7].set_final_state()
+Nodes[7].set_description("SYMBOL")
 
 Nodes[8].add_to_edges(9, ['other2'])
 
 Nodes[9].set_back_track()
 Nodes[9].set_final_state()
+Nodes[9].set_description("SYMBOL")
 
 Nodes[10].add_to_edges(11, ['/'])
 Nodes[10].add_to_edges(13, ['*'])
@@ -145,7 +154,8 @@ def is_other5(ch):
     return False
 
 
-def check_edges(ch):
+def check_edges(ch,state):
+    global Nodes
     state_edges =  Nodes[state].get_edges()
     return_state = False
     for k,v in state_edges:
@@ -183,7 +193,9 @@ def check_edges(ch):
 
     return return_state
 
+
 def change_state_by_char(string, pointer, state, lexeme):
+    global Nodes
     current_char = string[pointer]
     next_state = 0
     pointer_move = 0
@@ -191,7 +203,7 @@ def change_state_by_char(string, pointer, state, lexeme):
     error = ""
     temp_lexeme = ""
     if is_valid(current_char):
-        next_state = check_edges(current_char)
+        next_state = check_edges(current_char, state)
         if not next_state:
             # Error handler(state)
         else:
@@ -199,7 +211,6 @@ def change_state_by_char(string, pointer, state, lexeme):
             temp_lexeme = lexeme + current_char
             if Nodes[next_state].final_state:
                 token_found = True
-                next_state = 0
                 if Nodes[next_state].back_track:
                     pointer_move = 0
                 else:
@@ -211,21 +222,47 @@ def change_state_by_char(string, pointer, state, lexeme):
 
     return token_found, next_state, pointer_move, temp_lexeme, error
 
+def get_token_name(state, lexeme):
+    if state == 2:
+        for i in keyword_list[:11]:
+            if lexeme == i :
+                return "KEYWORD"
+        return "ID"
+    else:
+        return Nodes[state].description
 
 def get_next_token():
+    global pointer
+    global line
+    global state
+    global input_file
     temp_lexeme = ""
-    next_state = state
-    current_char = input_file[pointer]
+    token_name = ""
+    token_found = False
+    return_state = []
 
-
-
-    else:
-        # error
-
+    while not token_found:
+        return_state = change_state_by_char(input_file, pointer, state, temp_lexeme)
+        if return_state[0]:
+            state = 0
+            temp_lexeme = return_state[3]
+            token_name = get_token_name(return_state[1], temp_lexeme)
+            if return_state[1] == 12:
+                return ""
+            elif return_state[1] == 15:
+                if temp_lexeme == "\n":
+                    state = return_state[1]
+                    line += 1
+                    return ""
+                else:
+                    return ""
+            else:
+                token_found = True
+                return "(%s, %s)" % (token_name, temp_lexeme)
 
 
 while while_state:
     get_next_token()
     if pointer == (len(input_file) - 1):
         while_state = False
-    pointer += 1
+
