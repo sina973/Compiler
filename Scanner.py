@@ -34,9 +34,21 @@ state = 0
 keyword_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
 symbols = []
 symbol_list = []
+
+# open the input file
 file = open("input.txt", 'r')
 input_file = file.read()
 file.close()
+
+# open the error file
+error_file = open("lexical_errors.txt", 'a')
+
+# open the Symbol table file
+symbol_table_file = open('symbol_table.txt', 'a')
+symbol_table_file.write("1.\tif\n2.\telse\n3.\tvoid\n4.\tint\n5.\twhile\n6.\tbreak\n7.\tswitch\n8.\tdefault\n9.\tcase\n10.\treturn\n")
+# open the tokens file
+tokens_file = open('tokens.txt', 'a')
+
 while_state = True
 pointer = 0
 line = 1
