@@ -1,3 +1,6 @@
+# Amirhossein Koochari 95170651
+# Sina Radpour 97071002
+
 class Node:
 
     def __init__(self, id):
@@ -112,6 +115,7 @@ def is_valid(ch):           # Check if input character is valid
 
     return False
 
+######################### On Edges Others function ######################
 
 def is_other(ch):
     if not ch.isdigit():
@@ -153,8 +157,28 @@ def is_other5(ch):
         return True
     return False
 
+################################## Error Handler ################################
 
-def check_edges(ch,state):
+def error_handler(s):
+    if s == 8:
+        return unmatched_comment_error()
+    elif s == 3:
+        return invalid_number_error()
+    else:
+        return unclosed_comment_error()
+
+def unclosed_comment_error():
+    return "Unclosed comment"
+
+def unmatched_comment_error():
+    return "Unmatched comment"
+
+def invalid_number_error():
+    return "Invalid number"
+
+################################# End Of Error Handler ###############################
+
+def check_edges(ch, state):
     global Nodes
     state_edges =  Nodes[state].get_edges()
     return_state = False
