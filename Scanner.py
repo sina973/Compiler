@@ -34,6 +34,9 @@ state = 0
 keyword_list = ['if', 'else', 'void', 'int', 'while', 'break', 'switch', 'default', 'case', 'return']
 symbols = []
 symbol_list = []
+for i in keyword_list:
+    symbol_list.append([i])
+
 
 # open the input file
 file = open("input.txt", 'r')
@@ -44,10 +47,10 @@ file.close()
 error_file = open("lexical_errors.txt", 'a')
 
 # open the Symbol table file
-symbol_table_file = open('symbol_table.txt', 'a')
+symbol_table_file = open('symbol_table.txt', 'w')
 symbol_table_file.write("1.\tif\n2.\telse\n3.\tvoid\n4.\tint\n5.\twhile\n6.\tbreak\n7.\tswitch\n8.\tdefault\n9.\tcase\n10.\treturn\n")
 # open the tokens file
-tokens_file = open('tokens.txt', 'a')
+tokens_file = open('tokens.txt', 'w')
 
 while_state = True
 pointer = 0
@@ -274,6 +277,7 @@ def get_next_token():
     global line
     global state
     global input_file
+    global symbol_list
     temp_lexeme = ""
     token_name = ""
     return_state = []
@@ -293,11 +297,20 @@ def get_next_token():
             elif return_state[1] == 12:
                 temp_lexeme = ""
             else:
+                if token_name == "ID":
+                    symbol_list.append([temp_lexeme])
                 return "(%s, %s)" % (token_name, temp_lexeme)
+        elif return_state[4] != "":
+            # handle errors
 
 
 while while_state:
-    get_next_token()
+    token = get_next_token()
+    if len(tokens) < line :
+        tokens.append([token])
+    else:
+        tokens[line - 1].append(token)
+
     if pointer == (len(input_file) - 1):
         while_state = False
 
