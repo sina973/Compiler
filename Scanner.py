@@ -215,6 +215,8 @@ def change_state_by_char(string, pointer, state, lexeme):
                     pointer_move = 0
                 else:
                     pointer_move = 1
+            else:
+                pointer_move = 1
     else:
         error = "invalid input"
         pointer_move = 1
@@ -238,26 +240,23 @@ def get_next_token():
     global input_file
     temp_lexeme = ""
     token_name = ""
-    token_found = False
     return_state = []
 
-    while not token_found:
+    while True:
         return_state = change_state_by_char(input_file, pointer, state, temp_lexeme)
+        temp_lexeme = return_state[3]
+        pointer += return_state[2]
         if return_state[0]:
             state = 0
-            temp_lexeme = return_state[3]
             token_name = get_token_name(return_state[1], temp_lexeme)
-            if return_state[1] == 12:
-                return ""
-            elif return_state[1] == 15:
+            if return_state[1] == 15:
                 if temp_lexeme == "\n":
                     state = return_state[1]
                     line += 1
-                    return ""
-                else:
-                    return ""
+                temp_lexeme = ""
+            elif return_state[1] == 12:
+                temp_lexeme = ""
             else:
-                token_found = True
                 return "(%s, %s)" % (token_name, temp_lexeme)
 
 
