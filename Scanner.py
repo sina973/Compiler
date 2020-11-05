@@ -309,7 +309,9 @@ def get_next_token():
             token_name = get_token_name(return_state[1], temp_lexeme)
             if return_state[1] == 15:
                 if temp_lexeme == "\n":
+                    print("enter")
                     line += 1
+                    print(line)
                 temp_lexeme = ""
             elif return_state[1] == 12:
                 temp_lexeme = ""
@@ -324,21 +326,29 @@ def get_next_token():
         else:
             state = return_state[1]
 
+        if pointer >= len(input_file):
+            if (state > 9 and state < 12) or (state > 12 and state < 15):
+                error_handler("Unclosed Comment", "", line)
+                return None
 
-print(len(input_file))
+# print(len(input_file))
 
 
 while while_state:
     #print(pointer)
     token = get_next_token()
     print(token)
+    print(line)
     if len(tokens) < line:
-        tokens.append([token])
+        if token:
+            tokens.append([token])
     else:
-        tokens[line - 1].append(token)
+        if token:
+            tokens[line - 1].append(token)
 
-    if pointer == (len(input_file) - 10):
+    if pointer >= (len(input_file)):
         while_state = False
-        print("FALSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 print(tokens)
+print(errors)
+print(symbol_list)
