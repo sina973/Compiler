@@ -362,6 +362,6 @@ while while_state:
     if pointer >= (len(input_file)):
         while_state = False
 
-print(tokens)               # TODO: fix adding duplicate elements in symbol table
-print(errors)               # TODO: fix the error when enter is at the end of file
-print(symbol_list)          # TODO: Put $ at the end of file
+print(tokens)
+print(errors)
+print(symbol_list)

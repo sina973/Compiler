@@ -370,7 +370,7 @@ def make_table(file_name):
 
 def extract_token(temp_token):
     current_token = ""
-    if temp_token[1:5] == "NUM":
+    if temp_token[1:4] == "NUM":
         current_token = "num"
     elif temp_token[1:3] == "ID":
         current_token = "id"
@@ -396,22 +396,24 @@ def add_error(error_number, token=None, top_stack=None):
 
 def parser_check(stack_top, token):
     global parser_stack
-    relation = tables.get(stack_top).get(token)
-    print(relation)
     stack_terminal = is_terminal(stack_top)
     print("is terminal:", stack_terminal)
     if stack_terminal:
         if stack_top != token:
+            parser_stack.pop()
             add_error(3, token, stack_top)
             return False
         else:
             parser_stack.pop()
             return True
+    relation = tables.get(stack_top).get(token)
+    print("relation:", relation)
     if len(relation) == 1:
         if relation[0] == ".":
             add_error(1, token)
             return True
         elif relation[0] == "synch":
+            parser_stack.pop()
             add_error(2, token, stack_top)
             return False
         elif relation[0] == "e":
@@ -423,11 +425,10 @@ def parser_check(stack_top, token):
             return False
     else:
         parser_stack.pop()
-        bound = len(relation)
-        for j in range(bound, -1, -1):
-            parser_stack.append(relation[j])
-            print("parser stack:::::::", parser_stack)
-            return False
+        for k in range(len(relation) - 1, -1, -1):
+            parser_stack.append(relation[k])
+
+        return False
 
 
 tables = make_table("Parse Table.txt")
@@ -435,15 +436,16 @@ parser_stack = ["Program"]
 parser_errors = []
 current_token = ""
 
-for k in tables:
-    print("%s: " % k, end="")
-    print(tables.get(k))
+# for k in tables:
+#     print("%s: " % k, end="")
+#     print(tables.get(k))
 
 get_token = True
+
 while while_state:
     if get_token:
         current_temp_token = get_next_token()
-        print(current_temp_token)
+        print("token:", current_temp_token)
         current_token = extract_token(current_temp_token)
         if len(tokens) < line:
             if current_temp_token:
@@ -454,11 +456,11 @@ while while_state:
         if pointer >= (len(input_file)):
             while_state = False
 
-    print(current_token)
+    print("curent token:", current_token)
     print(parser_stack, "next is parser check !!!!!!!!!!!!!!!!!!!!!!!")
     get_token = parser_check(parser_stack[len(parser_stack) - 1], current_token)
-    print(parser_stack)
-    print(get_token)
+    print("parser stack after check:", parser_stack)
+    print("getting next token:", get_token)
 
     if len(parser_stack) < 1:
         while_state = False

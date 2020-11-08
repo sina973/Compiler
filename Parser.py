@@ -1,4 +1,3 @@
-
 def make_table(file_name):
     file = open(file_name, 'r')
     input_file_lines = file.readlines()
@@ -21,6 +20,7 @@ def make_table(file_name):
 
     return table
 
+
 def extract_token(temp_token):
     current_token = ""
     if temp_token[0] == "NUM":
@@ -32,9 +32,47 @@ def extract_token(temp_token):
     return current_token
 
 
+def is_terminal(stack_element):
+    return stack_element[0].isupper()
+
+
+def add_error(error_number, token=None, top_stack=None):
+    global parser_errors
+    if error_number == 1:
+        parser_errors.apppend("Misplaced %s, parser is skipping it" % token)
+    elif error_number == 2:
+        parser_errors.apppend("Missing term, pop %s from parser stack" % top_stack)
+    elif error_number == 3:
+        parser_errors.apppend("Inserting %s before %s, pop %s from parser stack" % top_stack, token, top_stack)
+
+
+
+def parser_check(stack_top, token):
+    global parser_stack
+    relation = tables.get(stack_top).get(token)
+    x = 0
+    stack_terminal = is_terminal(stack_top)
+    if stack_terminal:
+        if stack_top != token:
+            add_error(3, token, stack_top)
+    if len(relation) == 1:
+        if relation[0] == ".":
+            add_error(1, token)
+        elif relation[0] == "synch":
+            add_error(2, token, stack_top)
+        elif relation[0] == "e":
+            parser_stack.pop()
+        else:
+            parser_stack.pop()
+            parser_stack.append(relation[0])
+    else:
+        while len(relation) != 0:
+            parser_stack.append(relation.pop())
+
 
 tables = make_table("Parse Table.txt")
 parser_stack = ["Program"]
+parser_errors = []
 
 for k in tables:
     print("%s: " % k, end="")
