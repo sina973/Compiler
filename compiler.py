@@ -1,3 +1,4 @@
+# #################### Scanner ###############################################
 # Amirhossein Koochari 95170651
 # Sina Radpour 97071002
 
@@ -342,26 +343,127 @@ def get_next_token():
                 state = 0
                 return "(EOF, $)"
 
-# print(len(input_file))
+# ######################################### Parser #########################################################
+
+def make_table(file_name):
+    file = open(file_name, 'r')
+    input_file_lines = file.readlines()
+    file.close()
+
+    table = {}
+
+    terminals = []
+    first_line = input_file_lines[0].split()
+    for i in range(0, len(first_line)):
+        terminals.append(first_line[i])
+
+    for i in range(1, len(input_file_lines)):
+        line = input_file_lines[i]
+        words = line.split()
+        temp_dictionary = {}
+        for j in range(1, len(words)):
+            temp_dictionary.update({terminals[j]: words[j].split("`")})
+        table.update({words[0]: temp_dictionary})
+
+    return table
 
 
-while while_state:
-    #print(pointer)
-    token = get_next_token()
-    # print(token)
-    # print(line)
-    # if token is None:
-    #     while_state = False
-    if len(tokens) < line:
-        if token:
-            tokens.append([token])
+def extract_token(temp_token):
+    current_token = ""
+    if temp_token[1:5] == "NUM":
+        current_token = "num"
+    elif temp_token[1:3] == "ID":
+        current_token = "id"
     else:
-        if token:
-            tokens[line - 1].append(token)
+        current_token = temp_token.split(",")[1]
+        current_token = current_token[1:len(current_token)-1]
+    return current_token
 
-    if pointer >= (len(input_file)):
+
+def is_terminal(stack_element):
+    return not stack_element[0].isupper()
+
+
+def add_error(error_number, token=None, top_stack=None):
+    global parser_errors
+    if error_number == 1:
+        parser_errors.append("Misplaced %s, parser is skipping it" % token)
+    elif error_number == 2:
+        parser_errors.append("Missing term, pop %s from parser stack" % top_stack)
+    elif error_number == 3:
+        parser_errors.append("Inserting %s before %s, pop %s from parser stack" % (top_stack, token, top_stack))
+
+
+def parser_check(stack_top, token):
+    global parser_stack
+    relation = tables.get(stack_top).get(token)
+    print(relation)
+    stack_terminal = is_terminal(stack_top)
+    print("is terminal:", stack_terminal)
+    if stack_terminal:
+        if stack_top != token:
+            add_error(3, token, stack_top)
+            return False
+        else:
+            parser_stack.pop()
+            return True
+    if len(relation) == 1:
+        if relation[0] == ".":
+            add_error(1, token)
+            return True
+        elif relation[0] == "synch":
+            add_error(2, token, stack_top)
+            return False
+        elif relation[0] == "e":
+            parser_stack.pop()
+            return False
+        else:
+            parser_stack.pop()
+            parser_stack.append(relation[0])
+            return False
+    else:
+        parser_stack.pop()
+        bound = len(relation)
+        for j in range(bound, -1, -1):
+            parser_stack.append(relation[j])
+            print("parser stack:::::::", parser_stack)
+            return False
+
+
+tables = make_table("Parse Table.txt")
+parser_stack = ["Program"]
+parser_errors = []
+current_token = ""
+
+for k in tables:
+    print("%s: " % k, end="")
+    print(tables.get(k))
+
+get_token = True
+while while_state:
+    if get_token:
+        current_temp_token = get_next_token()
+        print(current_temp_token)
+        current_token = extract_token(current_temp_token)
+        if len(tokens) < line:
+            if current_temp_token:
+                tokens.append([current_temp_token])
+        else:
+            if current_temp_token:
+                tokens[line - 1].append(current_temp_token)
+        if pointer >= (len(input_file)):
+            while_state = False
+
+    print(current_token)
+    print(parser_stack, "next is parser check !!!!!!!!!!!!!!!!!!!!!!!")
+    get_token = parser_check(parser_stack[len(parser_stack) - 1], current_token)
+    print(parser_stack)
+    print(get_token)
+
+    if len(parser_stack) < 1:
         while_state = False
 
-print(tokens)               # TODO: fix adding duplicate elements in symbol table
-print(errors)               # TODO: fix the error when enter is at the end of file
-print(symbol_list)          # TODO: Put $ at the end of file
+
+
+
+
