@@ -309,9 +309,9 @@ def get_next_token():
             token_name = get_token_name(return_state[1], temp_lexeme)
             if return_state[1] == 15:
                 if temp_lexeme == "\n":
-                    print("enter")
+                    # print("enter")
                     line += 1
-                    print(line)
+                    # print(line)
                 temp_lexeme = ""
             elif return_state[1] == 12:
                 temp_lexeme = ""
@@ -337,8 +337,8 @@ def get_next_token():
 while while_state:
     #print(pointer)
     token = get_next_token()
-    print(token)
-    print(line)
+    # print(token)
+    # print(line)
     if len(tokens) < line:
         if token:
             tokens.append([token])
@@ -349,6 +349,6 @@ while while_state:
     if pointer >= (len(input_file)):
         while_state = False
 
-print(tokens)
-print(errors)
-print(symbol_list)
+print(tokens)               # TODO: fix adding duplicate elements in symbol table
+print(errors)               # TODO: fix the error when enter is at the end of file
+print(symbol_list)          # TODO: Put $ at the end of file
