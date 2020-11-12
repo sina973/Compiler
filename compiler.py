@@ -396,10 +396,12 @@ def add_error(error_number, token=None, top_stack=None):
         parser_errors.append("Inserting %s before %s, pop %s from parser stack" % (top_stack, token, top_stack))
 
 
-def parser_check(stack_top, token):
+def parser_check(stack_top, token, full_token):
     global parser_stack
     global tree_Nodes
+    # relation = tables.get(stack_top[0]).get(token)
     stack_terminal = is_terminal(stack_top[0])
+    # print(stack_top[0])
     # print("is terminal:", stack_terminal)
     if stack_terminal:
         if stack_top[0] != token:
@@ -408,6 +410,9 @@ def parser_check(stack_top, token):
             return False
         else:
             parser_stack.pop()
+            tree_Nodes[stack_top[1]].name = full_token
+            # print(tree_Nodes[stack_top[1]])
+            # print(full_token, 1)
             return True
     relation = tables.get(stack_top[0]).get(token)
     # print("relation:", relation)
@@ -421,6 +426,7 @@ def parser_check(stack_top, token):
             return False
         elif relation[0] == "e":
             parser_stack.pop()
+            tree_Nodes.append(Node("epsilon", parent=tree_Nodes[stack_top[1]]))
             return False
         else:
             parser_stack.pop()
@@ -451,9 +457,11 @@ current_token = ""
 #     print(tables.get(k))
 
 get_token = True
+current_temp_token = None
 while while_state:
     if get_token:
         current_temp_token = get_next_token()
+        # print(current_temp_token)
         # print("token:", current_temp_token)
         current_token = extract_token(current_temp_token)
         if len(tokens) < line:
@@ -467,17 +475,19 @@ while while_state:
 
     # print("curent token:", current_token)
     # print(parser_stack, "next is parser check !!!!!!!!!!!!!!!!!!!!!!!")
-    get_token = parser_check(parser_stack[len(parser_stack) - 1], current_token)
+    get_token = parser_check(parser_stack[len(parser_stack) - 1], current_token, current_temp_token)
     # print("parser stack after check:", parser_stack)
     # print("getting next token:", get_token)
 
     if len(parser_stack) < 1:
         while_state = False
 
-# for pre, fill, node in RenderTree(tree_Nodes[0]):
-#     print("%s%s" % (pre, node.name))
-print(RenderTree(tree_Nodes[0]))
-print(tree_Nodes)
+for pre, fill, node in RenderTree(tree_Nodes[0]):
+    print("%s%s" % (pre, node.name))
+# print(RenderTree(tree_Nodes[0]))
+# print(tree_Nodes)
+print(parser_errors)
+
 
 # TODO: Fix anytree
 # TODO: Fix error file
