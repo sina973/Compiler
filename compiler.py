@@ -1,8 +1,10 @@
-# #################### Scanner ###############################################
+# #################### Scanner and parser ###############################################
 # Amirhossein Koochari 95170651
 # Sina Radpour 97071002
+from anytree import *
 
-class Node:
+
+class State_Node:
 
     def __init__(self, id):
         self.id = id
@@ -61,7 +63,7 @@ tokens = []
 
 
 for i in range(0, 16):
-    Nodes.append(Node(i))
+    Nodes.append(State_Node(i))
 
 # #############  Add exit edges of each node ##################
 
@@ -396,43 +398,51 @@ def add_error(error_number, token=None, top_stack=None):
 
 def parser_check(stack_top, token):
     global parser_stack
-    stack_terminal = is_terminal(stack_top)
-    print("is terminal:", stack_terminal)
+    global tree_Nodes
+    stack_terminal = is_terminal(stack_top[0])
+    # print("is terminal:", stack_terminal)
     if stack_terminal:
-        if stack_top != token:
+        if stack_top[0] != token:
             parser_stack.pop()
-            add_error(3, token, stack_top)
+            add_error(3, token, stack_top[0])
             return False
         else:
             parser_stack.pop()
             return True
-    relation = tables.get(stack_top).get(token)
-    print("relation:", relation)
+    relation = tables.get(stack_top[0]).get(token)
+    # print("relation:", relation)
     if len(relation) == 1:
         if relation[0] == ".":
             add_error(1, token)
             return True
         elif relation[0] == "synch":
             parser_stack.pop()
-            add_error(2, token, stack_top)
+            add_error(2, token, stack_top[0])
             return False
         elif relation[0] == "e":
             parser_stack.pop()
             return False
         else:
             parser_stack.pop()
-            parser_stack.append(relation[0])
+            parser_stack.append([relation[0], len(tree_Nodes)])
+            tree_Nodes.append(Node(relation[0], parent=tree_Nodes[stack_top[1]]))
             return False
     else:
         parser_stack.pop()
+        temp_relation = []
         for k in range(len(relation) - 1, -1, -1):
-            parser_stack.append(relation[k])
+            parser_stack.append([relation[k], (len(tree_Nodes) + k)])
+            temp_relation.append([relation[k], (len(tree_Nodes) + k)])
+        for k in range(len(temp_relation) - 1, -1, -1):
+            tree_Nodes.append(Node(temp_relation[k][0], parent=tree_Nodes[stack_top[1]]))
 
         return False
 
 
 tables = make_table("Parse Table.txt")
-parser_stack = ["Program"]
+parser_stack = [["Program", 0]]
+tree_Nodes = []
+tree_Nodes.append(Node("Program"))
 parser_errors = []
 current_token = ""
 
@@ -441,11 +451,10 @@ current_token = ""
 #     print(tables.get(k))
 
 get_token = True
-
 while while_state:
     if get_token:
         current_temp_token = get_next_token()
-        print("token:", current_temp_token)
+        # print("token:", current_temp_token)
         current_token = extract_token(current_temp_token)
         if len(tokens) < line:
             if current_temp_token:
@@ -456,16 +465,19 @@ while while_state:
         if pointer >= (len(input_file)):
             while_state = False
 
-    print("curent token:", current_token)
-    print(parser_stack, "next is parser check !!!!!!!!!!!!!!!!!!!!!!!")
+    # print("curent token:", current_token)
+    # print(parser_stack, "next is parser check !!!!!!!!!!!!!!!!!!!!!!!")
     get_token = parser_check(parser_stack[len(parser_stack) - 1], current_token)
-    print("parser stack after check:", parser_stack)
-    print("getting next token:", get_token)
+    # print("parser stack after check:", parser_stack)
+    # print("getting next token:", get_token)
 
     if len(parser_stack) < 1:
         while_state = False
 
+# for pre, fill, node in RenderTree(tree_Nodes[0]):
+#     print("%s%s" % (pre, node.name))
+print(RenderTree(tree_Nodes[0]))
+print(tree_Nodes)
 
-
-
-
+# TODO: Fix anytree
+# TODO: Fix error file

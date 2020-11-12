@@ -49,17 +49,17 @@ def add_error(error_number, token=None, top_stack=None):
 
 def parser_check(stack_top, token):
     global parser_stack
-    relation = tables.get(stack_top).get(token)
+    relation = tables.get(stack_top[0]).get(token)
     x = 0
-    stack_terminal = is_terminal(stack_top)
+    stack_terminal = is_terminal(stack_top[0])
     if stack_terminal:
-        if stack_top != token:
-            add_error(3, token, stack_top)
+        if stack_top[0] != token:
+            add_error(3, token, stack_top[0])
     if len(relation) == 1:
         if relation[0] == ".":
             add_error(1, token)
         elif relation[0] == "synch":
-            add_error(2, token, stack_top)
+            add_error(2, token, stack_top[0])
         elif relation[0] == "e":
             parser_stack.pop()
         else:
