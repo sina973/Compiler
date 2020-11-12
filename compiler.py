@@ -1,6 +1,8 @@
 # #################### Scanner and parser ###############################################
 # Amirhossein Koochari 95170651
 # Sina Radpour 97071002
+import io
+
 from anytree import *
 
 
@@ -386,19 +388,20 @@ def is_terminal(stack_element):
     return not stack_element[0].isupper()
 
 
-def add_error(error_number, token=None, top_stack=None):
+def add_error(error_number, line_number, token=None, top_stack=None):
     global parser_errors
     if error_number == 1:
-        parser_errors.append("Misplaced %s, parser is skipping it" % token)
+        parser_errors.append("#%d : misplaced %s, parser is skipping it" % (line_number, token))
     elif error_number == 2:
-        parser_errors.append("Missing term, pop %s from parser stack" % top_stack)
+        parser_errors.append("#%d : syntax error, missing %s" % (line_number, top_stack))
     elif error_number == 3:
-        parser_errors.append("Inserting %s before %s, pop %s from parser stack" % (top_stack, token, top_stack))
+        parser_errors.append("#%d : inserting %s before %s, pop %s from parser stack" % (line_number, top_stack, token, top_stack))
 
 
 def parser_check(stack_top, token, full_token):
     global parser_stack
     global tree_Nodes
+    global line
     # relation = tables.get(stack_top[0]).get(token)
     stack_terminal = is_terminal(stack_top[0])
     # print(stack_top[0])
@@ -406,7 +409,7 @@ def parser_check(stack_top, token, full_token):
     if stack_terminal:
         if stack_top[0] != token:
             parser_stack.pop()
-            add_error(3, token, stack_top[0])
+            add_error(3, line, token, stack_top[0])
             return False
         else:
             parser_stack.pop()
@@ -418,11 +421,11 @@ def parser_check(stack_top, token, full_token):
     # print("relation:", relation)
     if len(relation) == 1:
         if relation[0] == ".":
-            add_error(1, token)
+            add_error(1, line, token)
             return True
         elif relation[0] == "synch":
             parser_stack.pop()
-            add_error(2, token, stack_top[0])
+            add_error(2, line, token, stack_top[0])
             return False
         elif relation[0] == "e":
             parser_stack.pop()
@@ -482,11 +485,22 @@ while while_state:
     if len(parser_stack) < 1:
         while_state = False
 
-for pre, fill, node in RenderTree(tree_Nodes[0]):
-    print("%s%s" % (pre, node.name))
+
+# for pre, fill, node in RenderTree(tree_Nodes[0]):
+#     print("%s%s" % (pre, node.name))
+
 # print(RenderTree(tree_Nodes[0]))
 # print(tree_Nodes)
-print(parser_errors)
+# print(parser_errors)
+with io.open("Parser Tree.txt", "w", encoding="utf-8") as f:
+    for pre, fill, node in RenderTree(tree_Nodes[0]):
+        f.write("%s%s\n" % (pre, node.name))
 
-
-# TODO: Fix error file
+# Write in error file
+error_file = open("syntax_errors.txt", 'w')
+if len(parser_errors) == 0:
+    error_file.write("There is no syntax error.")
+else:
+    for statement in parser_errors:
+        error_file.write(statement + '\n')
+error_file.close()
