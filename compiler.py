@@ -496,6 +496,7 @@ with io.open("Parser Tree.txt", "w", encoding="utf-8") as f:
     for pre, fill, node in RenderTree(tree_Nodes[0]):
         f.write("%s%s\n" % (pre, node.name))
 
+
 # Write in error file
 error_file = open("syntax_errors.txt", 'w')
 if len(parser_errors) == 0:
